@@ -144,7 +144,7 @@ const createFormCreateTemplate = (point, offers, destinations) => {
 
 export default class FormCreateView {
   constructor(point, offers, destination) {
-    this.point = point || {
+    this._point = point || {
       basePrice: 0,
       dateFrom: new Date(),
       dateTo: new Date(),
@@ -153,23 +153,24 @@ export default class FormCreateView {
       offers: [],
       type: 'bus'
     };
-    this.offers = offers || [];
-    this.destination = destination || {};
+    this._offers = offers || [];
+    this._destination = destination || {};
+    this._element = null;
   }
 
-  getTemplate() {
-    return createFormCreateTemplate(this.point, this.offers, this.destination);
+  get template() {
+    return createFormCreateTemplate(this._point, this._offers, this._destination);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate(this.point, this.offers, this.destination));
+  get element() {
+    if (!this._element) {
+      this._element = createElement(this.template);
     }
 
-    return this.element;
+    return this._element;
   }
 
   removeElement() {
-    this.element = null;
+    this._element = null;
   }
 }
