@@ -10,9 +10,9 @@ const navigationContainer = pageElement.querySelector('.trip-controls__navigatio
 const filterContainer = pageElement.querySelector('.trip-controls__filters');
 const tripEventsContainer = pageElement.querySelector('.trip-events');
 
-const tripPresenter = new TripPresenter();
+const tripPresenter = new TripPresenter(tripEventsContainer, new TripModel(10));
 
 render(new NavigationView(), navigationContainer);
 render(new FilterView(), filterContainer);
 render(new SortView(), tripEventsContainer);
-tripPresenter.init(tripEventsContainer, new TripModel(7));
+tripPresenter.init();
