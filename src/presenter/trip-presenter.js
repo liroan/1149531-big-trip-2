@@ -4,13 +4,20 @@ import RoutePointView from '../view/route-point-view';
 import FormCreateView from '../view/form-create-view';
 
 export default class TripPresenter {
-  init(tripEventsContainer) {
+  init(tripEventsContainer, tripModel) {
     const tripListContainer = new TripListView();
-    const form = new FormCreateView();
+    const trips = tripModel.getTripsInfo();
+    const offers = tripModel.getTripsOffers();
+    const destinations = tripModel.getTripsDestinations();
     render(tripListContainer, tripEventsContainer);
-    render(form, tripEventsContainer);
-    for (let i = 0; i < 3; i++) {
-      render(new RoutePointView(), tripListContainer.getElement());
+    render(new FormCreateView(trips[0], offers, destinations), tripListContainer.getElement());
+    render(new FormCreateView(null, offers, destinations), tripListContainer.getElement());
+
+    for (let i = 0; i < trips.length; i++) {
+      const matchOffers = offers.filter((offer) => trips[i].offers.includes(offer.id));
+      const matchDestination = destinations.filter((destination) => trips[i].destination === destination);
+
+      render(new RoutePointView(trips[i], matchOffers, matchDestination), tripListContainer.getElement());
     }
   }
 }
