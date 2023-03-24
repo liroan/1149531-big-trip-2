@@ -23,6 +23,7 @@ const createFormCreateTemplate = (point, offers, destinations) => {
   const showOffers = offers.map(createOfferTemplate).join('');
   return (
     `
+    <li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
                 <header class="event__header">
                   <div class="event__type-wrapper">
@@ -115,6 +116,7 @@ const createFormCreateTemplate = (point, offers, destinations) => {
 
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
                   <button class="event__reset-btn" type="reset">Cancel</button>
+                  <button class="event__rollup-btn" type="button">
                 </header>
                 <section class="event__details">
                   <section class="event__section  event__section--offers">
@@ -139,12 +141,13 @@ const createFormCreateTemplate = (point, offers, destinations) => {
     }
 
               </form>
-  `
+              </li>
+    `
   );};
 
 export default class FormCreateView {
   constructor(point, offers, destination) {
-    this.point = point || {
+    this._point = point || {
       basePrice: 0,
       dateFrom: new Date(),
       dateTo: new Date(),
@@ -153,23 +156,24 @@ export default class FormCreateView {
       offers: [],
       type: 'bus'
     };
-    this.offers = offers || [];
-    this.destination = destination || {};
+    this._offers = offers || [];
+    this._destination = destination || {};
+    this._element = null;
   }
 
-  getTemplate() {
-    return createFormCreateTemplate(this.point, this.offers, this.destination);
+  get template() {
+    return createFormCreateTemplate(this._point, this._offers, this._destination);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate(this.point, this.offers, this.destination));
+  get element() {
+    if (!this._element) {
+      this._element = createElement(this.template);
     }
 
-    return this.element;
+    return this._element;
   }
 
   removeElement() {
-    this.element = null;
+    this._element = null;
   }
 }

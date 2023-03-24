@@ -3,20 +3,20 @@ import {generateTripDestination, generateTripOffer, generateTripPoint} from '../
 
 export default class TripModel {
   constructor(length) {
-    this.trips = Array.from({ length }, generateTripPoint );
-    this.offers = Array.from({ length }, (item, index) => generateTripOffer(index % 2) );
-    this.destinations = Array.from({ length }, generateTripDestination );
+    this._trips = Array.from({ length }, generateTripPoint );
+    this._offers = Array.from({ length }, (item, index) => generateTripOffer(index % 2) );
+    this._destinations = Array.from({ length }, generateTripDestination );
   }
 
-  getTripsInfo() {
-    return this.trips;
+  get tripsInfo() {
+    return this._trips;
   }
 
-  getTripsOffers() {
-    return this.offers;
+  get tripsOffers() {
+    return this._offers;
   }
 
-  getTripsDestinations() {
-    return this.destinations;
+  get tripsDestinations() {
+    return this._destinations;
   }
 }
