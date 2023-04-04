@@ -1,5 +1,5 @@
-import {createElement} from '../render.js';
 import dayjs from 'dayjs';
+import AbstractView from '../framework/view/abstract-view';
 const createOfferTemplate = ({title, price, id}) => (`
     <div class="event__offer-selector">
        <input class="event__offer-checkbox  visually-hidden" id=${`event-offer-seats-${  id}`} type="checkbox" name="event-offer-seats">
@@ -145,8 +145,9 @@ const createFormCreateTemplate = (point, offers, destinations) => {
     `
   );};
 
-export default class FormCreateView {
+export default class FormCreateView extends AbstractView {
   constructor(point, offers, destination) {
+    super();
     this._point = point || {
       basePrice: 0,
       dateFrom: new Date(),
@@ -159,21 +160,30 @@ export default class FormCreateView {
     this._offers = offers || [];
     this._destination = destination || {};
     this._element = null;
+    this._handlerClick = this._handlerClick.bind(this);
+    this._handlerSubmit = this._handlerSubmit.bind(this);
+  }
+
+  setClickCloseForm(callback) {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this._handlerClick);
+  }
+
+  setSubmitForm(callback) {
+    this._callback.submit = callback;
+    this.element.addEventListener('submit', this._handlerSubmit);
+  }
+
+  _handlerClick() {
+    this._callback.click();
+  }
+
+  _handlerSubmit(e) {
+    e.preventDefault();
+    this._callback.submit();
   }
 
   get template() {
     return createFormCreateTemplate(this._point, this._offers, this._destination);
-  }
-
-  get element() {
-    if (!this._element) {
-      this._element = createElement(this.template);
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

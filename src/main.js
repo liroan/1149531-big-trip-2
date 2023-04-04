@@ -1,9 +1,9 @@
-import {render} from './render';
 import NavigationView from './view/navigation-view';
 import FilterView from './view/filter-view';
 import SortView from './view/sort-view';
 import TripPresenter from './presenter/trip-presenter';
 import TripModel from './model/trip-model';
+import {render} from "./framework/render";
 
 const pageElement = document.querySelector('.page-body');
 const navigationContainer = pageElement.querySelector('.trip-controls__navigation');
