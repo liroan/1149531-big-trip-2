@@ -1,23 +1,27 @@
 import {render} from '../render';
 import RoutePointView from '../view/route-point-view';
 import FormCreateView from '../view/form-create-view';
-import {remove, replace} from "../framework/render";
+import {remove, replace} from '../framework/render';
 
 export default class RoutePresenter {
-  constructor({tripListContainer}) {
+  constructor({tripListContainer, onDataChange}) {
     this._tripListContainer = tripListContainer;
     this._openForm = this._openForm.bind(this);
     this._escCloseForm = this._escCloseForm.bind(this);
     this._closeForm = this._closeForm.bind(this);
+    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._routePoint = null;
     this._form = null;
+    this._handleDataChange = onDataChange;
   }
 
   init(trip, matchDestination, matchOffers, allOffers, allDestination) {
     const prevRoutePoint = this._routePoint;
     const prevRoutePointForm = this._form;
-
-    this._routePoint = new RoutePointView(trip, matchOffers, matchDestination);
+    this._trip = trip;
+    console.log(trip)
+    this._routePoint = new RoutePointView(trip, matchOffers, matchDestination,
+      this._handleFavoriteClick);
     this._form = new FormCreateView(trip, allOffers, allDestination);
     this._form.setClickCloseForm(this._closeForm);
     this._form.setSubmitForm(this._closeForm);
@@ -27,12 +31,10 @@ export default class RoutePresenter {
       render(this._routePoint, this._tripListContainer.element);
       return;
     }
-
-    if (this._tripListContainer.contains(prevRoutePoint.element)) {
+    if (this._tripListContainer.element.contains(prevRoutePoint.element)) {
       replace(this._routePoint, prevRoutePoint);
     }
-
-    if (this._tripListContainer.contains(prevRoutePointForm.element)) {
+    if (this._tripListContainer.element.contains(prevRoutePointForm.element)) {
       replace(this._form, prevRoutePointForm);
     }
 
@@ -45,7 +47,12 @@ export default class RoutePresenter {
     remove(this._form);
   }
 
-  _closeForm() {
+  _handleFavoriteClick() {
+    this._handleDataChange({...this._trip, isFavorite: !this._trip.isFavorite});
+  }
+
+  _closeForm(task) {
+    this._handleDataChange(task);
     this._tripListContainer.element.replaceChild(this._routePoint.element, this._form.element);
     document.removeEventListener('keydown', this._escCloseForm);
   }

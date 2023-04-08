@@ -1,5 +1,4 @@
-import {createElement} from '../render.js';
-import AbstractView from "../framework/view/abstract-view";
+import AbstractView from '../framework/view/abstract-view';
 // eslint-disable-next-line no-undef
 const dayjs = require('dayjs');
 
@@ -13,7 +12,7 @@ const createOfferTemplate = ({ title, price }) => (`
 
 const createRoutePointTemplate = (point, offers, destination) => {
   const {  basePrice, dateFrom, dateTo } = point;
-  const offersView = offers.map(createOfferTemplate);
+  const offersView = offers && offers.map(createOfferTemplate);
   const isShowDestination = false;
   const timeDiffHours = dayjs(dateTo).diff(dayjs(dateFrom), 'h');
   const timeDiffMinutes = dayjs(dateTo).diff(dayjs(dateFrom), 'm');
@@ -47,7 +46,7 @@ const createRoutePointTemplate = (point, offers, destination) => {
              </p>
              <h4 class="visually-hidden">Offers:</h4>
              <ul class="event__selected-offers">
-                ${offersView.join('')}
+                ${offersView && offersView.join('')}
              </ul>
              <button class="event__favorite-btn event__favorite-btn--active" type="button">
                <span class="visually-hidden">Add to favorite</span>
@@ -65,13 +64,21 @@ const createRoutePointTemplate = (point, offers, destination) => {
 
 
 export default class RoutePointView extends AbstractView {
-  constructor(point, offers, destination) {
+  constructor(point, offers, destination, onFavoriteClick) {
     super();
     this._point = point;
     this._offers = offers;
     this._destination = destination;
-    this._handlerClick = this._handlerClick.bind(this)
+    this._handlerClick = this._handlerClick.bind(this);
+    this._handleFavoriteClick = onFavoriteClick;
+    this.element.querySelector('.event__favorite-btn')
+      .addEventListener('click', this._favoriteClickHandler);
   }
+
+  _favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._handleFavoriteClick();
+  };
 
   setClickRoute(callback) {
     this._callback.click = callback;
