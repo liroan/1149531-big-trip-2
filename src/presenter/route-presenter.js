@@ -3,8 +3,13 @@ import RoutePointView from '../view/route-point-view';
 import FormCreateView from '../view/form-create-view';
 import {remove, replace} from '../framework/render';
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
 export default class RoutePresenter {
-  constructor({tripListContainer, onDataChange}) {
+  constructor({tripListContainer, onDataChange, onModeChange}) {
     this._tripListContainer = tripListContainer;
     this._openForm = this._openForm.bind(this);
     this._escCloseForm = this._escCloseForm.bind(this);
@@ -13,6 +18,8 @@ export default class RoutePresenter {
     this._routePoint = null;
     this._form = null;
     this._handleDataChange = onDataChange;
+    this._handleModeChange = onModeChange;
+    this._mode = Mode.DEFAULT;
   }
 
   init(trip, matchDestination, matchOffers, allOffers, allDestination) {
@@ -31,15 +38,21 @@ export default class RoutePresenter {
       render(this._routePoint, this._tripListContainer.element);
       return;
     }
-    if (this._tripListContainer.element.contains(prevRoutePoint.element)) {
+    if (this._mode === Mode.DEFAULT) {
       replace(this._routePoint, prevRoutePoint);
     }
-    if (this._tripListContainer.element.contains(prevRoutePointForm.element)) {
+    if (this._mode === Mode.EDITING) {
       replace(this._form, prevRoutePointForm);
     }
 
     remove(prevRoutePoint);
     remove(prevRoutePointForm);
+  }
+
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._closeForm(this._trip);
+    }
   }
 
   destroy() {
@@ -55,6 +68,7 @@ export default class RoutePresenter {
     this._handleDataChange(task);
     this._tripListContainer.element.replaceChild(this._routePoint.element, this._form.element);
     document.removeEventListener('keydown', this._escCloseForm);
+    this._mode = Mode.DEFAULT;
   }
 
   _escCloseForm(e) {
@@ -65,5 +79,7 @@ export default class RoutePresenter {
   _openForm() {
     this._tripListContainer.element.replaceChild(this._form.element, this._routePoint.element);
     document.addEventListener('keydown', this._escCloseForm);
+    this._handleModeChange();
+    this._mode = Mode.EDITING;
   }
 }

@@ -4,6 +4,7 @@ import NoRoutePointsView from '../view/no-route-points';
 import RoutePresenter from './route-presenter';
 
 function updateItem(items, update) {
+  console.log(items, update)
   return items.map((item) => item.id === update.id ? update : item);
 }
 
@@ -38,7 +39,8 @@ export default class TripPresenter {
       const matchDestination = this._destinations.filter((destination) => this._offers[i].destination === destination);
       const routePresenter = new RoutePresenter({
         tripListContainer: this._tripListContainer,
-        onDataChange: this._handleTaskChange
+        onDataChange: this._handleTaskChange,
+        onModeChange: this._handleModeChange
       });
       routePresenter.init(this._trips[i], matchDestination, matchOffers, this._offers, this._destinations)
       this._taskPresenters.set(this._trips[i].id, routePresenter)
@@ -49,6 +51,10 @@ export default class TripPresenter {
     this._taskPresenters.forEach((presenter) => presenter.destroy());
     this._taskPresenters.clear();
   }
+
+  _handleModeChange = () => {
+    this._taskPresenters.forEach((presenter) => presenter.resetView());
+  };
 
   _handleTaskChange = (updatedTask) => {
     this._trips = updateItem(this._trips, updatedTask);
