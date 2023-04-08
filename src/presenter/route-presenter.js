@@ -1,6 +1,7 @@
 import {render} from '../render';
 import RoutePointView from '../view/route-point-view';
 import FormCreateView from '../view/form-create-view';
+import {remove, replace} from "../framework/render";
 
 export default class RoutePresenter {
   constructor({tripListContainer}) {
@@ -8,16 +9,40 @@ export default class RoutePresenter {
     this._openForm = this._openForm.bind(this);
     this._escCloseForm = this._escCloseForm.bind(this);
     this._closeForm = this._closeForm.bind(this);
+    this._routePoint = null;
+    this._form = null;
   }
 
   init(trip, matchDestination, matchOffers, allOffers, allDestination) {
+    const prevRoutePoint = this._routePoint;
+    const prevRoutePointForm = this._form;
+
     this._routePoint = new RoutePointView(trip, matchOffers, matchDestination);
     this._form = new FormCreateView(trip, allOffers, allDestination);
     this._form.setClickCloseForm(this._closeForm);
     this._form.setSubmitForm(this._closeForm);
-
     this._routePoint.setClickRoute(this._openForm);
-    render(this._routePoint, this._tripListContainer.element);
+
+    if (prevRoutePoint === null || prevRoutePointForm === null) {
+      render(this._routePoint, this._tripListContainer.element);
+      return;
+    }
+
+    if (this._tripListContainer.contains(prevRoutePoint.element)) {
+      replace(this._routePoint, prevRoutePoint);
+    }
+
+    if (this._tripListContainer.contains(prevRoutePointForm.element)) {
+      replace(this._form, prevRoutePointForm);
+    }
+
+    remove(prevRoutePoint);
+    remove(prevRoutePointForm);
+  }
+
+  destroy() {
+    remove(this._routePoint);
+    remove(this._form);
   }
 
   _closeForm() {
