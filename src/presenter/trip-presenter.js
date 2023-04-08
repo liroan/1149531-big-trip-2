@@ -1,8 +1,7 @@
 import {render} from '../render';
 import TripListView from '../view/trip-list-view';
-import RoutePointView from '../view/route-point-view';
-import FormCreateView from '../view/form-create-view';
 import NoRoutePointsView from '../view/no-route-points';
+import RoutePresenter from './route-presenter';
 
 export default class TripPresenter {
   constructor(tripEventsContainer, tripModel) {
@@ -12,7 +11,6 @@ export default class TripPresenter {
     this._offers = tripModel.tripsOffers;
     this._destinations = tripModel.tripsDestinations;
     this._renderRoutePoints = this._renderRoutePoints.bind(this);
-    this._settingsRenderPoint = this._settingsRenderPoint.bind(this);
     this._renderNoRoutePoints = this._renderNoRoutePoints.bind(this);
   }
 
@@ -33,31 +31,10 @@ export default class TripPresenter {
     for (let i = 0; i < this._trips.length; i++) {
       const matchOffers = this._offers.filter((offer) => this._trips[i].offers.includes(offer.id));
       const matchDestination = this._destinations.filter((destination) => this._offers[i].destination === destination);
-      const routePoint = new RoutePointView(this._trips[i], matchOffers, matchDestination);
-      this._settingsRenderPoint(routePoint);
-      render(routePoint, this._tripListContainer.element);
+      const routePresenter = new RoutePresenter({
+        tripListContainer: this._tripListContainer,
+      });
+      routePresenter.init(this._trips[i], matchDestination, matchOffers, this._offers, this._destinations)
     }
-  }
-
-  _settingsRenderPoint(routePoint) {
-    const form = new FormCreateView(this._trips[0], this._offers, this._destinations);
-    const closeForm = () => {
-      this._tripListContainer.element.replaceChild(routePoint.element, form.element);
-      document.removeEventListener('keydown', escCloseForm);
-    };
-    function escCloseForm(e) {
-      if (e.key !== 'Esc' && e.key !== 'Escape') {return;}
-      closeForm(e);
-    }
-
-    const openForm = () => {
-      this._tripListContainer.element.replaceChild(form.element, routePoint.element);
-      document.addEventListener('keydown', escCloseForm);
-    };
-
-    form.setClickCloseForm(closeForm);
-    form.setSubmitForm(closeForm);
-
-    routePoint.setClickRoute(openForm);
   }
 }
