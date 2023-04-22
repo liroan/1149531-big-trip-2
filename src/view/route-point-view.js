@@ -1,4 +1,5 @@
 import {createElement} from '../render.js';
+import AbstractView from "../framework/view/abstract-view";
 // eslint-disable-next-line no-undef
 const dayjs = require('dayjs');
 
@@ -62,27 +63,26 @@ const createRoutePointTemplate = (point, offers, destination) => {
       </li>
 `);};
 
-export default class RoutePointView {
+
+export default class RoutePointView extends AbstractView {
   constructor(point, offers, destination) {
-    this._element = null;
+    super();
     this._point = point;
     this._offers = offers;
     this._destination = destination;
+    this._handlerClick = this._handlerClick.bind(this)
+  }
+
+  setClickRoute(callback) {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this._handlerClick);
+  }
+
+  _handlerClick() {
+    this._callback.click();
   }
 
   get template() {
     return createRoutePointTemplate(this._point, this._offers, this._destination);
-  }
-
-  get element() {
-    if (!this._element) {
-      this._element = createElement(this.template);
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

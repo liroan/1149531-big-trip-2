@@ -41,8 +41,7 @@ export default class TripPresenter {
 
   _settingsRenderPoint(routePoint) {
     const form = new FormCreateView(this._trips[0], this._offers, this._destinations);
-    const closeForm = (event) => {
-      event.preventDefault();
+    const closeForm = () => {
       this._tripListContainer.element.replaceChild(routePoint.element, form.element);
       document.removeEventListener('keydown', escCloseForm);
     };
@@ -55,9 +54,10 @@ export default class TripPresenter {
       this._tripListContainer.element.replaceChild(form.element, routePoint.element);
       document.addEventListener('keydown', escCloseForm);
     };
-    form.element.addEventListener('submit', closeForm);
-    form.element.querySelector('.event__rollup-btn').addEventListener('click', closeForm);
-    routePoint.element.querySelector('.event__rollup-btn').addEventListener('click', openForm);
 
+    form.setClickCloseForm(closeForm);
+    form.setSubmitForm(closeForm);
+
+    routePoint.setClickRoute(openForm);
   }
 }
