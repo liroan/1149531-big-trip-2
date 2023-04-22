@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import AbstractView from '../framework/view/abstract-view';
+import {nanoid} from "nanoid";
 const createOfferTemplate = ({title, price, id}) => (`
     <div class="event__offer-selector">
        <input class="event__offer-checkbox  visually-hidden" id=${`event-offer-seats-${  id}`} type="checkbox" name="event-offer-seats">
@@ -17,8 +18,8 @@ const createFormCreateTemplate = (point, offers, destinations) => {
 
   const dateFromTransform = dayjs(dateFrom);
   const dateToTransform = dayjs(dateTo);
-  const currentDestination = destinations.find((des) => des.id === destination);
-  const showDestinations = destinations.map(createDestinationTemplate).join('');
+  const currentDestination = destinations && destinations.find((des) => des.id === destination);
+  const showDestinations = destinations && destinations.map(createDestinationTemplate).join('');
   const destinationsPhotos = currentDestination && currentDestination.pictures.map(createDestinationPhotosTemplate).join('');
   const showOffers = offers.map(createOfferTemplate).join('');
   return (
@@ -89,7 +90,7 @@ const createFormCreateTemplate = (point, offers, destinations) => {
                     <label class="event__label  event__type-output" for="event-destination-1">
                       Flight
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=${currentDestination ? currentDestination.name : destinations[0].name} list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=${currentDestination ? currentDestination.name : destinations[0]?.name} list="destination-list-1">
                     <datalist id="destination-list-1">
                       ${showDestinations}
                     </datalist>
@@ -155,10 +156,11 @@ export default class FormCreateView extends AbstractView {
       destination: null,
       isFavorite: false,
       offers: [],
-      type: 'bus'
+      type: 'bus',
+      id: nanoid()
     };
     this._offers = offers || [];
-    this._destination = destination || {};
+    this._destination = destination || [];
     this._element = null;
     this._handlerClick = this._handlerClick.bind(this);
     this._handlerSubmit = this._handlerSubmit.bind(this);
@@ -180,7 +182,7 @@ export default class FormCreateView extends AbstractView {
 
   _handlerSubmit(e) {
     e.preventDefault();
-    this._callback.submit();
+    this._callback.submit(this._point);
   }
 
   get template() {

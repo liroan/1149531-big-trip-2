@@ -1,3 +1,4 @@
+import {nanoid} from "nanoid";
 
 
 export const generateTripDestination = () => ({
@@ -23,7 +24,7 @@ export const generateTripPoint = () => ({
   dateFrom: '2019-07-10T23:55:56.845Z',
   dateTo: '2019-07-11T00:22:13.375Z',
   destination: 1,
-  id: 0,
+  id: nanoid(),
   isFavorite: false,
   offers: [1,2,3],
   type: 'bus'
