@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
-import AbstractView from '../framework/view/abstract-view';
 import {nanoid} from "nanoid";
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+
 const createOfferTemplate = ({title, price, id}) => (`
     <div class="event__offer-selector">
        <input class="event__offer-checkbox  visually-hidden" id=${`event-offer-seats-${  id}`} type="checkbox" name="event-offer-seats">
@@ -13,15 +14,10 @@ const createOfferTemplate = ({title, price, id}) => (`
 `);
 const createDestinationPhotosTemplate = ({src, description}) => `<img class="event__photo" src=${src} alt=${description}>`;
 const createDestinationTemplate = ({name}) => ` <option value=${name}></option>`;
-const createFormCreateTemplate = (point, offers, destinations) => {
-  const {  basePrice, dateFrom, dateTo, destination } = point;
+const createFormCreateTemplate = ({ point, destinations }) => {
+  const {  basePrice, dateFromTransform, dateToTransform, currentDestination, 
+    showDestinations, destinationsPhotos, showOffers} = point;
 
-  const dateFromTransform = dayjs(dateFrom);
-  const dateToTransform = dayjs(dateTo);
-  const currentDestination = destinations && destinations.find((des) => des.id === destination);
-  const showDestinations = destinations && destinations.map(createDestinationTemplate).join('');
-  const destinationsPhotos = currentDestination && currentDestination.pictures.map(createDestinationPhotosTemplate).join('');
-  const showOffers = offers.map(createOfferTemplate).join('');
   return (
     `
     <li class="trip-events__item">
@@ -146,21 +142,10 @@ const createFormCreateTemplate = (point, offers, destinations) => {
     `
   );};
 
-export default class FormCreateView extends AbstractView {
-  constructor(point, offers, destination) {
+export default class FormCreateView extends AbstractStatefulView {
+  constructor(point, offers, destinations) {
     super();
-    this._point = point || {
-      basePrice: 0,
-      dateFrom: new Date(),
-      dateTo: new Date(),
-      destination: null,
-      isFavorite: false,
-      offers: [],
-      type: 'bus',
-      id: nanoid()
-    };
-    this._offers = offers || [];
-    this._destination = destination || [];
+    this._state = FormCreateView.parseTaskToState(point, offers, destinations);
     this._element = null;
     this._handlerClick = this._handlerClick.bind(this);
     this._handlerSubmit = this._handlerSubmit.bind(this);
@@ -182,10 +167,50 @@ export default class FormCreateView extends AbstractView {
 
   _handlerSubmit(e) {
     e.preventDefault();
-    this._callback.submit(this._point);
+    this._callback.submit(FormCreateView.parseStateToTask(this._state));
   }
 
+  static parseTaskToState = (point, offers, destinations) => {
+    const newPoint = point || {
+      basePrice: 0,
+      dateFrom: new Date(),
+      dateTo: new Date(),
+      destination: null,
+      isFavorite: false,
+      offers: [],
+      type: 'bus',
+      id: nanoid()
+    }
+
+    const currentDestination = destinations && destinations.find((des) => des.id === newPoint.destination)
+
+    return ({
+      point: { 
+        ...newPoint,
+        dateFromTransform: dayjs(newPoint.dateFrom),
+        dateToTransform: dayjs(newPoint.dateTo),
+        currentDestination,
+        showDestinations: destinations && destinations.map(createDestinationTemplate).join(''),
+        destinationsPhotos: currentDestination && currentDestination.pictures.map(createDestinationPhotosTemplate).join(''),
+        showOffers: offers.map(createOfferTemplate).join(''),
+      }, 
+    })
+  };
+
+  static parseStateToTask = (state) => {
+    const { point } = state;
+
+    delete point.dateFromTransform
+    delete point.dateToTransform
+    delete point.currentDestination
+    delete point.showDestinations
+    delete point.destinationsPhotos
+    delete point.showOffers
+
+    return point;
+  };
+
   get template() {
-    return createFormCreateTemplate(this._point, this._offers, this._destination);
+    return createFormCreateTemplate(this._state);
   }
 }
