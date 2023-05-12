@@ -11,7 +11,7 @@ const createOfferTemplate = ({ title, price }) => (`
 `);
 
 const createRoutePointTemplate = (point, offers, destination) => {
-  const {  basePrice, dateFrom, dateTo } = point;
+  const {  basePrice, dateFrom, dateTo, type } = point;
   const offersView = offers && offers.map(createOfferTemplate);
   const isShowDestination = false;
   const timeDiffHours = dayjs(dateTo).diff(dayjs(dateFrom), 'h');
@@ -23,7 +23,7 @@ const createRoutePointTemplate = (point, offers, destination) => {
             ${dayjs(dateFrom).format('MMM DD')}
           </time>
           <div class="event__type">
-             <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
+             <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
           </div>
              <h3 class="event__title">Taxi Amsterdam</h3>
              <div class="event__schedule">

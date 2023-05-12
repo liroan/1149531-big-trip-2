@@ -1,6 +1,6 @@
 import {nanoid} from "nanoid";
 
-const destinations = []
+export const offerTransports = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant']
 
 
 export const generateTripDestination = (id) => ({
