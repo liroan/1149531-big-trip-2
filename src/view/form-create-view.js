@@ -150,11 +150,13 @@ export default class FormCreateView extends AbstractStatefulView {
     this._handlerClick = this._handlerClick.bind(this);
     this._handlerSubmit = this._handlerSubmit.bind(this);
 
-    this.element.querySelector('.event__type-group')
-      .addEventListener('click', this.#selectTypeTransportHandler);
-    this.element.querySelector('.event__input--destination')
-      .addEventListener('input', this.#changeDestinastionHandler);
+    this.#setInnerHandlers();
   }
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setSubmitForm(this._callback.submit);
+  };
 
   setClickCloseForm(callback) {
     this._callback.click = callback;
@@ -165,6 +167,13 @@ export default class FormCreateView extends AbstractStatefulView {
     this._callback.submit = callback;
     this.element.addEventListener('submit', this._handlerSubmit);
   }
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-group')
+      .addEventListener('click', this.#selectTypeTransportHandler);
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('input', this.#changeDestinastionHandler);
+  };
 
   _handlerClick() {
     this._callback.click();
