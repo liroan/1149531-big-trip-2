@@ -13,6 +13,7 @@ export default class RoutePresenter {
     this._tripListContainer = tripListContainer;
     this._openForm = this._openForm.bind(this);
     this._escCloseForm = this._escCloseForm.bind(this);
+    this._closeFormWithDeleteNewData = this._closeFormWithDeleteNewData.bind(this);
     this._closeForm = this._closeForm.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._routePoint = null;
@@ -20,17 +21,22 @@ export default class RoutePresenter {
     this._handleDataChange = onDataChange;
     this._handleModeChange = onModeChange;
     this._mode = Mode.DEFAULT;
+    this._offers = []
+    this._allDestination = []
   }
 
   init(trip, matchDestination, matchOffers, allOffers, allDestination) {
+    console.log(matchDestination)
     const prevRoutePoint = this._routePoint;
     const prevRoutePointForm = this._form;
+    this._offers = matchOffers
+    this._allDestination = allDestination
     this._trip = trip;
     console.log(trip)
     this._routePoint = new RoutePointView(trip, matchOffers, matchDestination,
       this._handleFavoriteClick);
     this._form = new FormCreateView(trip, allOffers, allDestination);
-    this._form.setClickCloseForm(this._closeForm);
+    this._form.setClickCloseForm(this._closeFormWithDeleteNewData);
     this._form.setSubmitForm(this._closeForm);
     this._routePoint.setClickRoute(this._openForm);
 
@@ -51,7 +57,7 @@ export default class RoutePresenter {
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
-      this._closeForm(this._trip);
+      this._closeFormWithDeleteNewData(this._trip);
     }
   }
 
@@ -64,16 +70,20 @@ export default class RoutePresenter {
     this._handleDataChange({...this._trip, isFavorite: !this._trip.isFavorite});
   }
 
-  _closeForm(task) {
-    this._handleDataChange(task);
+  _closeForm() {
     this._tripListContainer.element.replaceChild(this._routePoint.element, this._form.element);
     document.removeEventListener('keydown', this._escCloseForm);
     this._mode = Mode.DEFAULT;
   }
 
+  _closeFormWithDeleteNewData() {
+    this._closeForm()
+    this._form.reset(this._trip, this._offers, this._allDestination)
+  }
+
   _escCloseForm(e) {
     if (e.key !== 'Esc' && e.key !== 'Escape') {return;}
-    this._closeForm(e);
+    this._closeFormWithDeleteNewData();
   }
 
   _openForm() {
