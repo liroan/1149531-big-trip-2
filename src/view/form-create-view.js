@@ -14,7 +14,7 @@ const createOfferTemplate = ({title, price, id}) => (`
 `);
 const createDestinationPhotosTemplate = ({src, description}) => `<img class="event__photo" src=${src} alt=${description}>`;
 const createDestinationTemplate = ({name}) => ` <option value=${name}></option>`;
-const createFormCreateTemplate = ({ point, destinations }) => {
+const createFormCreateTemplate = (point) => {
   const {  basePrice, dateFromTransform, dateToTransform, currentDestination, 
     showDestinations, destinationsPhotos, showOffers} = point;
 
@@ -149,6 +149,11 @@ export default class FormCreateView extends AbstractStatefulView {
     this._element = null;
     this._handlerClick = this._handlerClick.bind(this);
     this._handlerSubmit = this._handlerSubmit.bind(this);
+
+    this.element.querySelector('.event__type-group')
+      .addEventListener('click', this.#selectTypeTransportHandler);
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('input', this.#changeDestinastionHandler);
   }
 
   setClickCloseForm(callback) {
@@ -164,6 +169,24 @@ export default class FormCreateView extends AbstractStatefulView {
   _handlerClick() {
     this._callback.click();
   }
+
+  #selectTypeTransportHandler = (evt) => {
+    evt.preventDefault();
+
+    const option = evt.target.closest('.event__type-item')?.querySelector('.event__type-input').value;
+    if (!option) return;
+
+    this.updateElement({
+      type: option,
+    });
+  };
+
+  #changeDestinastionHandler = (evt) => {
+    evt.preventDefault();
+    this.updateElement({
+      currentDestination: this._state.destinations.find(d => d.name === evt.target.value),
+    });
+  };
 
   _handlerSubmit(e) {
     e.preventDefault();
@@ -183,22 +206,20 @@ export default class FormCreateView extends AbstractStatefulView {
     }
 
     const currentDestination = destinations && destinations.find((des) => des.id === newPoint.destination)
-
     return ({
-      point: { 
-        ...newPoint,
-        dateFromTransform: dayjs(newPoint.dateFrom),
-        dateToTransform: dayjs(newPoint.dateTo),
-        currentDestination,
-        showDestinations: destinations && destinations.map(createDestinationTemplate).join(''),
-        destinationsPhotos: currentDestination && currentDestination.pictures.map(createDestinationPhotosTemplate).join(''),
-        showOffers: offers.map(createOfferTemplate).join(''),
-      }, 
+      ...newPoint,
+      dateFromTransform: dayjs(newPoint.dateFrom),
+      dateToTransform: dayjs(newPoint.dateTo),
+      currentDestination,
+      showDestinations: destinations && destinations.map(createDestinationTemplate).join(''),
+      destinationsPhotos: currentDestination && currentDestination.pictures.map(createDestinationPhotosTemplate).join(''),
+      showOffers: offers.map(createOfferTemplate).join(''), 
+      destinations
     })
   };
 
   static parseStateToTask = (state) => {
-    const { point } = state;
+    const point = {...state};
 
     delete point.dateFromTransform
     delete point.dateToTransform

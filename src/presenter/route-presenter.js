@@ -64,8 +64,7 @@ export default class RoutePresenter {
     this._handleDataChange({...this._trip, isFavorite: !this._trip.isFavorite});
   }
 
-  _closeForm(task) {
-    this._handleDataChange(task);
+  _closeForm() {
     this._tripListContainer.element.replaceChild(this._routePoint.element, this._form.element);
     document.removeEventListener('keydown', this._escCloseForm);
     this._mode = Mode.DEFAULT;

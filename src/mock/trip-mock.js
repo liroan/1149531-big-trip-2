@@ -1,16 +1,27 @@
 import {nanoid} from "nanoid";
 
+const destinations = []
 
-export const generateTripDestination = () => ({
-  id: 1,
-  description: 'Chamonix, is a beautiful city, a true asian pearl, with crowded streets.',
-  name: 'Chamonix',
-  pictures: [
+
+export const generateTripDestination = (id) => ({
+  id,
+  description: `${id === 1 ? 'Chamonix' : 'Lol'}, is a beautiful city, a true asian pearl, with crowded streets.`,
+  name: id === 1 ? 'Chamonix' : 'Lol',
+  pictures: id === 1 ? [
     {
       src: 'img/photos/1.jpg',
       description: 'Chamonix parliament building'
     }
-  ]
+  ] : [
+    {
+      src: 'img/photos/1.jpg',
+      description: 'Chamonix parliament building'
+    },
+    {
+      src: 'img/photos/1.jpg',
+      description: 'Chamonix parliament building'
+    },
+  ],
 });
 
 export const generateTripOffer = (id) => ({
