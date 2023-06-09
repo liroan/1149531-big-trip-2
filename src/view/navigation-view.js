@@ -1,35 +1,27 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 
-const createNavigationTemplate = () => (
+const createNavigation = (nav) => (`
+      <a class="trip-tabs__btn" href="#">${nav}</a>
+`);
+
+const createNavigationTemplate = (navigations) => (
   `
   <div class="trip-controls__navigation">
     <h2 class="visually-hidden">Switch trip view</h2>
     <nav class="trip-controls__trip-tabs  trip-tabs">
-      <a class="trip-tabs__btn  trip-tabs__btn--active" href="#">Table</a>
-      <a class="trip-tabs__btn" href="#">Stats</a>
+    ${navigations.map((nav) => createNavigation(nav)).join('')}
     </nav>
   </div>
   `
 );
 
-export default class NavigationView {
-  constructor() {
-    this._element = null;
+export default class NavigationView extends AbstractView {
+  constructor(navigations) {
+    super();
+    this.navigations = navigations;
   }
 
   get template() {
-    return createNavigationTemplate();
-  }
-
-  get element() {
-    if (!this._element) {
-      this._element = createElement(this.template);
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    return createNavigationTemplate(this.navigations);
   }
 }

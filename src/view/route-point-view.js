@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 // eslint-disable-next-line no-undef
 const dayjs = require('dayjs');
 
@@ -11,8 +11,8 @@ const createOfferTemplate = ({ title, price }) => (`
 `);
 
 const createRoutePointTemplate = (point, offers, destination) => {
-  const {  basePrice, dateFrom, dateTo } = point;
-  const offersView = offers.map(createOfferTemplate);
+  const {  basePrice, dateFrom, dateTo, type } = point;
+  const offersView = offers && offers.map(createOfferTemplate);
   const isShowDestination = false;
   const timeDiffHours = dayjs(dateTo).diff(dayjs(dateFrom), 'h');
   const timeDiffMinutes = dayjs(dateTo).diff(dayjs(dateFrom), 'm');
@@ -23,7 +23,7 @@ const createRoutePointTemplate = (point, offers, destination) => {
             ${dayjs(dateFrom).format('MMM DD')}
           </time>
           <div class="event__type">
-             <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
+             <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
           </div>
              <h3 class="event__title">Taxi Amsterdam</h3>
              <div class="event__schedule">
@@ -46,7 +46,7 @@ const createRoutePointTemplate = (point, offers, destination) => {
              </p>
              <h4 class="visually-hidden">Offers:</h4>
              <ul class="event__selected-offers">
-                ${offersView.join('')}
+                ${offersView && offersView.join('')}
              </ul>
              <button class="event__favorite-btn event__favorite-btn--active" type="button">
                <span class="visually-hidden">Add to favorite</span>
@@ -62,27 +62,34 @@ const createRoutePointTemplate = (point, offers, destination) => {
       </li>
 `);};
 
-export default class RoutePointView {
-  constructor(point, offers, destination) {
-    this._element = null;
+
+export default class RoutePointView extends AbstractView {
+  constructor(point, offers, destination, onFavoriteClick) {
+    super();
     this._point = point;
     this._offers = offers;
     this._destination = destination;
+    this._handlerClick = this._handlerClick.bind(this);
+    this._handleFavoriteClick = onFavoriteClick;
+    this.element.querySelector('.event__favorite-btn')
+      .addEventListener('click', this._favoriteClickHandler);
+  }
+
+  _favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._handleFavoriteClick();
+  };
+
+  setClickRoute(callback) {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this._handlerClick);
+  }
+
+  _handlerClick() {
+    this._callback.click();
   }
 
   get template() {
     return createRoutePointTemplate(this._point, this._offers, this._destination);
-  }
-
-  get element() {
-    if (!this._element) {
-      this._element = createElement(this.template);
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

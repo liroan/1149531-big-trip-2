@@ -1,10 +1,15 @@
 import {render} from '../render';
 import TripListView from '../view/trip-list-view';
-import RoutePointView from '../view/route-point-view';
-import FormCreateView from '../view/form-create-view';
 import NoRoutePointsView from '../view/no-route-points';
+import RoutePresenter from './route-presenter';
+
+function updateItem(items, update) {
+  console.log(items, update)
+  return items.map((item) => item.id === update.id ? update : item);
+}
 
 export default class TripPresenter {
+  _taskPresenters = new Map();
   constructor(tripEventsContainer, tripModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._trips = tripModel.tripsInfo;
@@ -12,7 +17,6 @@ export default class TripPresenter {
     this._offers = tripModel.tripsOffers;
     this._destinations = tripModel.tripsDestinations;
     this._renderRoutePoints = this._renderRoutePoints.bind(this);
-    this._settingsRenderPoint = this._settingsRenderPoint.bind(this);
     this._renderNoRoutePoints = this._renderNoRoutePoints.bind(this);
   }
 
@@ -33,31 +37,30 @@ export default class TripPresenter {
     for (let i = 0; i < this._trips.length; i++) {
       const matchOffers = this._offers.filter((offer) => this._trips[i].offers.includes(offer.id));
       const matchDestination = this._destinations.filter((destination) => this._offers[i].destination === destination);
-      const routePoint = new RoutePointView(this._trips[i], matchOffers, matchDestination);
-      this._settingsRenderPoint(routePoint);
-      render(routePoint, this._tripListContainer.element);
+      const routePresenter = new RoutePresenter({
+        tripListContainer: this._tripListContainer,
+        onDataChange: this._handleTaskChange,
+        onModeChange: this._handleModeChange
+      });
+      routePresenter.init(this._trips[i], matchDestination, matchOffers, this._offers, this._destinations)
+      this._taskPresenters.set(this._trips[i].id, routePresenter)
     }
   }
 
-  _settingsRenderPoint(routePoint) {
-    const form = new FormCreateView(this._trips[0], this._offers, this._destinations);
-    const closeForm = (event) => {
-      event.preventDefault();
-      this._tripListContainer.element.replaceChild(routePoint.element, form.element);
-      document.removeEventListener('keydown', escCloseForm);
-    };
-    function escCloseForm(e) {
-      if (e.key !== 'Esc' && e.key !== 'Escape') {return;}
-      closeForm(e);
-    }
-
-    const openForm = () => {
-      this._tripListContainer.element.replaceChild(form.element, routePoint.element);
-      document.addEventListener('keydown', escCloseForm);
-    };
-    form.element.addEventListener('submit', closeForm);
-    form.element.querySelector('.event__rollup-btn').addEventListener('click', closeForm);
-    routePoint.element.querySelector('.event__rollup-btn').addEventListener('click', openForm);
-
+  _clearRoutePointsList() {
+    this._taskPresenters.forEach((presenter) => presenter.destroy());
+    this._taskPresenters.clear();
   }
+
+  _handleModeChange = () => {
+    this._taskPresenters.forEach((presenter) => presenter.resetView());
+  };
+
+  _handleTaskChange = (updatedTask) => {
+    this._trips = updateItem(this._trips, updatedTask);
+    const matchOffers = this._offers.filter((offer) => updatedTask.offers.includes(offer.id));
+    const matchDestination = this._destinations.filter((destination) => updatedTask.destination === destination);
+    console.log(updatedTask)
+    this._taskPresenters.get(updatedTask.id).init(updatedTask, matchDestination, matchOffers, this._offers, this._destinations);
+  };
 }

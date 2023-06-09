@@ -31,6 +31,9 @@
     "not < 0.25%"
   ],
   "dependencies": {
-    "dayjs": "^1.10.7"
+    "css-loader": "^6.7.3",
+    "dayjs": "^1.10.7",
+    "nanoid": "^4.0.2",
+    "style-loader": "^3.3.2"
   }
 }

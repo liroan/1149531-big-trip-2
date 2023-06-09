@@ -5,7 +5,7 @@ export default class TripModel {
   constructor(length) {
     this._trips = Array.from({ length }, generateTripPoint );
     this._offers = Array.from({ length }, (item, index) => generateTripOffer(index % 2) );
-    this._destinations = Array.from({ length }, generateTripDestination );
+    this._destinations = Array.from({ length }, (_, index) => generateTripDestination(index % 2) );
   }
 
   get tripsInfo() {
