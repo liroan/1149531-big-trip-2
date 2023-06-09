@@ -21,18 +21,16 @@ export default class RoutePresenter {
     this._handleDataChange = onDataChange;
     this._handleModeChange = onModeChange;
     this._mode = Mode.DEFAULT;
-    this._offers = []
-    this._allDestination = []
+    this._offers = [];
+    this._allDestination = [];
   }
 
   init(trip, matchDestination, matchOffers, allOffers, allDestination) {
-    console.log(matchDestination)
     const prevRoutePoint = this._routePoint;
     const prevRoutePointForm = this._form;
     this._offers = matchOffers
-    this._allDestination = allDestination
+    this._allDestination = allDestination;
     this._trip = trip;
-    console.log(trip)
     this._routePoint = new RoutePointView(trip, matchOffers, matchDestination,
       this._handleFavoriteClick);
     this._form = new FormCreateView(trip, allOffers, allDestination);
@@ -77,8 +75,8 @@ export default class RoutePresenter {
   }
 
   _closeFormWithDeleteNewData() {
-    this._closeForm()
-    this._form.reset(this._trip, this._offers, this._allDestination)
+    this._closeForm();
+    this._form.reset(this._trip, this._offers, this._allDestination);
   }
 
   _escCloseForm(e) {

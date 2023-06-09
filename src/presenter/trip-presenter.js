@@ -4,7 +4,6 @@ import NoRoutePointsView from '../view/no-route-points';
 import RoutePresenter from './route-presenter';
 
 function updateItem(items, update) {
-  console.log(items, update)
   return items.map((item) => item.id === update.id ? update : item);
 }
 
