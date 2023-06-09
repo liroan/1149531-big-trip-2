@@ -28,7 +28,7 @@ export default class RoutePresenter {
   init(trip, matchDestination, matchOffers, allOffers, allDestination) {
     const prevRoutePoint = this._routePoint;
     const prevRoutePointForm = this._form;
-    this._offers = matchOffers
+    this._offers = matchOffers;
     this._allDestination = allDestination;
     this._trip = trip;
     this._routePoint = new RoutePointView(trip, matchOffers, matchDestination,
