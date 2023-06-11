@@ -33,7 +33,7 @@ export default class RoutePresenter {
     this._trip = trip;
     this._routePoint = new RoutePointView(trip, matchOffers, matchDestination,
       this._handleFavoriteClick);
-    this._form = new FormCreateView(trip, allOffers, allDestination);
+    this._form = new FormCreateView(trip, matchDestination, matchOffers, allOffers, allDestination);
     this._form.setClickCloseForm(this._closeFormWithDeleteNewData);
     this._form.setSubmitForm(this._closeForm);
     this._routePoint.setClickRoute(this._openForm);

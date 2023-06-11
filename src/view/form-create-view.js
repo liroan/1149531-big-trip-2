@@ -10,9 +10,9 @@ const createOfferTransportsTemplate = (type) => (`
   </div>
 `);
 
-const createOfferTemplate = ({title, price, id}) => (`
+const createOfferTemplate = ({title, price, id, isActive}) => (`
     <div class="event__offer-selector">
-       <input class="event__offer-checkbox  visually-hidden" id=${`event-offer-seats-${  id}`} type="checkbox" name="event-offer-seats">
+       <input ${isActive ? 'checked' : ''} class="event__offer-checkbox  visually-hidden" id=${`event-offer-seats-${  id}`} type="checkbox" name="event-offer-seats">
        <label class="event__offer-label" for=${`event-offer-seats-${  id}`}>
        <span class="event__offer-title">${title}</span>
          &plus;&euro;&nbsp;
@@ -23,7 +23,7 @@ const createOfferTemplate = ({title, price, id}) => (`
 const createDestinationPhotosTemplate = ({src, description}) => `<img class="event__photo" src=${src} alt=${description}>`;
 const createDestinationTemplate = ({name}) => ` <option value=${name}></option>`;
 const createFormCreateTemplate = (point) => {
-  const {  basePrice, dateFromTransform, dateToTransform, currentDestination, 
+  const {  price, dateFromTransform, dateToTransform, currentDestination, 
     showDestinations, destinationsPhotos, showOffers, destinations, type } = point;
   return (
     `
@@ -71,7 +71,7 @@ const createFormCreateTemplate = (point) => {
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value=${basePrice}>
+                    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value=${price}>
                   </div>
 
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -106,9 +106,11 @@ const createFormCreateTemplate = (point) => {
   );};
 
 export default class FormCreateView extends AbstractStatefulView {
-  constructor(point, offers, destinations) {
-    super();
-    this._state = FormCreateView.parseTaskToState(point, offers, destinations);
+  constructor(point, destination, offers, allOffers, destinations) {
+    super()
+
+
+    this._state = FormCreateView.parseTaskToState(point, destination, offers, allOffers, destinations);
     this._handlerClick = this._handlerClick.bind(this);
     this._handlerSubmit = this._handlerSubmit.bind(this);
 
@@ -172,9 +174,9 @@ export default class FormCreateView extends AbstractStatefulView {
     );
   };
 
-  static parseTaskToState = (point, offers, destinations) => {
+  static parseTaskToState = (point, destinations, offers, allOffers, destinations1) => {
     const newPoint = point || {
-      basePrice: 0,
+      price: 0,
       dateFrom: new Date(),
       dateTo: new Date(),
       destination: null,
@@ -184,15 +186,18 @@ export default class FormCreateView extends AbstractStatefulView {
       id: nanoid()
     }
 
-    const currentDestination = destinations && destinations.find((des) => des.id === newPoint.destination)
+    const typeOff = allOffers.filter(o => o.type === point.type)[0].offers
+
+    console.log(offers)
+    const currentDestination = destinations1 && destinations1.find((des) => des.id === newPoint.destination)
     return ({
       ...newPoint,
       dateFromTransform: dayjs(newPoint.dateFrom).format('DD/MM/YYHH:mm'),
       dateToTransform: dayjs(newPoint.dateTo).format('DD/MM/YYHH:mm'),
       currentDestination,
-      showDestinations: destinations && destinations.map(createDestinationTemplate).join(''),
+      showDestinations: destinations1 && destinations1.map(createDestinationTemplate).join(''),
       destinationsPhotos: currentDestination && currentDestination.pictures.map(createDestinationPhotosTemplate).join(''),
-      showOffers: offers.map(createOfferTemplate).join(''), 
+      showOffers: typeOff.map((el, i) => createOfferTemplate({ ...el, isActive: Boolean(offers.find(o => o.id === typeOff[i].id)) })).join(''), 
       destinations
     })
   };
