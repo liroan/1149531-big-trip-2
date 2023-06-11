@@ -9,7 +9,7 @@ function updateItem(items, update) {
 
 export default class TripPresenter {
   _taskPresenters = new Map();
-  constructor(tripEventsContainer, tripModel) {
+  constructor(tripEventsContainer, tripModel, updatePoint) {
     this._tripEventsContainer = tripEventsContainer;
     this._trips = [];
     this._tripListContainer = new TripListView();
@@ -17,6 +17,7 @@ export default class TripPresenter {
     this._destinations = {};
     this._renderRoutePoints = this._renderRoutePoints.bind(this);
     this._renderNoRoutePoints = this._renderNoRoutePoints.bind(this);
+    this._updatePoint = updatePoint
   }
 
   init(isLoading, trips, offers, destinations) {
@@ -52,6 +53,7 @@ export default class TripPresenter {
           tripListContainer: this._tripListContainer,
           onDataChange: this._handleTaskChange,
           onModeChange: this._handleModeChange,
+          updatePoint: this._updatePoint
         });
         routePresenter.init(
           this._trips[i],

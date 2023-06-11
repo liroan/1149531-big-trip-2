@@ -165,7 +165,8 @@ export default class FormCreateView extends AbstractStatefulView {
 
   _handlerSubmit(e) {
     e.preventDefault();
-    this._callback.submit(FormCreateView.parseStateToTask(this._state));
+    const r = FormCreateView.parseStateToTask(this._state)
+    this._callback.submit(r.id, r);
   }
 
   reset(point, offers, destinations) {

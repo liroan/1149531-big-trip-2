@@ -9,7 +9,7 @@ const Mode = {
 };
 
 export default class RoutePresenter {
-  constructor({tripListContainer, onDataChange, onModeChange}) {
+  constructor({tripListContainer, onDataChange, onModeChange, updatePoint}) {
     this._tripListContainer = tripListContainer;
     this._openForm = this._openForm.bind(this);
     this._escCloseForm = this._escCloseForm.bind(this);
@@ -23,6 +23,7 @@ export default class RoutePresenter {
     this._mode = Mode.DEFAULT;
     this._offers = [];
     this._allDestination = [];
+    this._updatePoint = updatePoint;
   }
 
   init(trip, matchDestination, matchOffers, allOffers, allDestination) {
@@ -35,7 +36,12 @@ export default class RoutePresenter {
       this._handleFavoriteClick);
     this._form = new FormCreateView(trip, matchDestination, matchOffers, allOffers, allDestination);
     this._form.setClickCloseForm(this._closeFormWithDeleteNewData);
-    this._form.setSubmitForm(this._closeForm);
+    this._form.setSubmitForm((id, data) => {
+      try {
+        this._updatePoint({ id, data });
+        this._closeForm();
+      }
+    });
     this._routePoint.setClickRoute(this._openForm);
 
     if (prevRoutePoint === null || prevRoutePointForm === null) {

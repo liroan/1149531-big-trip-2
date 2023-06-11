@@ -6,23 +6,20 @@ export default class Adapter {
 
   getDestinations() {
     return this._api.getDestinations()
-        .then((destinations) => {
-          return destinations;
-        });
+      .then((destinations) => destinations);
+  }
+
+  updatePoint({ id, data }) {
+    return this._api.updatePoint(id, data);
   }
 
   getPoints() {
     return this._api.getPoints()
-        .then((events) => {
-          return events;
-        });
+      .then((events) => events);
   }
 
   getOffers() {
     return this._api.getOffers()
-        .then((offers) => {
-
-          return offers;
-        });
+      .then((offers) => offers);
   }
 }
