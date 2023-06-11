@@ -30,7 +30,7 @@ export default class API {
   fet({ url, body, headers = new Headers(), m = 'GET' }) {
     headers.append('Authorization', this.auth);
 
-    return fetch(`${this.end  }/${  url}`, {method: m, body: body || null, headers})
+    return fetch(`${this.end}/${url}`, {method: m, body: body || null, headers})
       .then((response) => {
         if (response.status >= 200 && response.status < 300) {
           return response;
@@ -61,7 +61,7 @@ export default class API {
 
   updatePoint(id, data) {
     return this.fet({
-      url: `points/${  id}`,
+      url: `points/${id}`,
       m: 'PUT',
       body: JSON.stringify(parseResponse(data)),
       headers: new Headers({ 'Content-Type': 'application/json' })
